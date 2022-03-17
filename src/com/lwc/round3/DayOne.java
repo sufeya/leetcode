@@ -67,31 +67,125 @@ public class DayOne {
      * 若其中有多个可行的答案，则返回答案中字典序最小的单词。若无答案，则返回空字符串。
      */
     public String longestWord(String[] words) {
-        return null;
+        int len = words.length;
+        Arrays.sort(words);
+        //用于保存words中的所有单词
+        Set<String> set =new HashSet<>();
+        for(String str :words){
+            set.add(str);
+        }
+        int maxLen = 0;
+        String res ="";
+        int minIndex=Integer.MAX_VALUE;
+        for(int i = 0;i < len ;i++){
+            String tempString = words[i];
+            int tempLen = tempString.length();
+            String temp =tempString.substring(0,tempLen-1);
+            if(set.contains(temp) || temp.equals("")){
+                if(maxLen<tempLen ||(maxLen == tempLen && minIndex > i)){
+                    res = tempString;
+                    minIndex = i;
+                    maxLen = tempLen;
+                }
+            }else{
+                //如果没有则直接移除
+                set.remove(tempString);
+            }
+        }
+        return res;
     }
 
 
 
 
     public static void main(String[] args) {
-        DayOne one=new DayOne();
-        AllOne allOne = new AllOne();
-        allOne.inc("a");
-        allOne.inc("b");
-        allOne.inc("c");
-        allOne.inc("d");
-        allOne.inc("a");
-        allOne.inc("b");
+        //DayOne one=new DayOne();
+        //System.out.println(one.longestWord(new String[]{"yo","ew","fc","zrc","yodn","fcm","qm","qmo","fcmz","z","ewq","yod","ewqz","y"}) );
+        Trie trie =new Trie();
+        trie.insert("apple");
+        System.out.println(trie.search("apple"));
+        System.out.println(trie.search("app"));
+        System.out.println(trie.startsWith("app"));
+        trie.insert("app");
+        System.out.println(trie.search("app"));
 
-        allOne.inc("c");
-        allOne.inc("d");
-        allOne.inc("c");
-        allOne.inc("d");
-        allOne.inc("a");
-
-        System.out.println(allOne.getMinKey() );
     }
 }
+
+/**
+ * 题号：208
+ * 难度：中等
+ * 时间：20220317
+ * （发音类似 "try"）或者说 前缀树 是一种树形数据结构，用于高效地存储和检索字符串数据集中的键。这一数据结构有相当多的应用情景，例如自动补完和拼写检查。
+ *
+ * 请你实现 Trie 类：
+ *
+ * Trie() 初始化前缀树对象。
+ * void insert(String word) 向前缀树中插入字符串 word 。
+ * boolean search(String word) 如果字符串 word 在前缀树中，返回 true（即，在检索之前已经插入）；否则，返回 false 。
+ * boolean startsWith(String prefix) 如果之前已经插入的字符串 word 的前缀之一为 prefix ，返回 true ；否则，返回 false 。
+ */
+class Trie {
+    Node root;
+    class Node{
+        //以该节点为前缀的单词数
+        int preix;
+        //以该该节点为结尾的的单词数
+        int count;
+        Node[] next = new Node[26];
+        public Node(){
+            preix=0;
+            count=0;
+        }
+    }
+
+    public Trie() {
+        root =new Node();
+    }
+
+    public void insert(String word) {
+        Node p = root;
+        char[] chars =word.toCharArray();
+        int len = word.length();
+        for(int i =0;i<len;i++){
+            if(p.next[chars[i] -'a'] == null){
+                p.next[chars[i]-'a'] = new Node();
+            }
+            p = p.next[chars[i]-'a'];
+            p.preix++;
+        }
+        p.count++;
+    }
+
+    public boolean search(String word) {
+        Node p =root;
+        char[] chars =word.toCharArray();
+        int len = word.length();
+        for(int i = 0; i<len ;i++){
+            if(p.next[chars[i] -'a'] == null){
+                return false;
+            }else{
+                p = p.next[chars[i] -'a'];
+            }
+        }
+        return p.count >0;
+    }
+
+    public boolean startsWith(String prefix) {
+        Node p =root;
+        char[] chars =prefix.toCharArray();
+        int len = prefix.length();
+        for(int i = 0; i<len ;i++){
+            if(p.next[chars[i] -'a'] == null){
+                return false;
+            }else{
+                p = p.next[chars[i] -'a'];
+            }
+        }
+        return p.preix >0;
+    }
+}
+
 /**
  * 请你设计一个用于存储字符串计数的数据结构，并能够返回计数最小和最大的字符串。
  * 实现 AllOne 类：
@@ -101,6 +195,7 @@ public class DayOne {
  * getMaxKey() 返回任意一个计数最大的字符串。如果没有元素存在，返回一个空字符串 "" 。
  * getMinKey() 返回任意一个计数最小的字符串。如果没有元素存在，返回一个空字符串 "" 。
  */
+
 class AllOne {
     Map<String,Integer> list;
     String max_tag;
