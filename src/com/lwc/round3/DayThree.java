@@ -163,4 +163,53 @@ public class DayThree {
         }
         return Math.min(countFive,countTwo);
     }
+
+    /**
+     * 题号：682
+     * 难度：简单
+     * 时间：20220326
+     * 你现在是一场采用特殊赛制棒球比赛的记录员。这场比赛由若干回合组成，过去几回合的得分可能会影响以后几回合的得分。
+     *
+     * 比赛开始时，记录是空白的。你会得到一个记录操作的字符串列表 ops，其中 ops[i] 是你需要记录的第 i 项操作，ops 遵循下述规则：
+     *
+     * 整数 x - 表示本回合新获得分数 x
+     * "+" - 表示本回合新获得的得分是前两次得分的总和。题目数据保证记录此操作时前面总是存在两个有效的分数。
+     * "D" - 表示本回合新获得的得分是前一次得分的两倍。题目数据保证记录此操作时前面总是存在一个有效的分数。
+     * "C" - 表示前一次得分无效，将其从记录中移除。题目数据保证记录此操作时前面总是存在一个有效的分数。
+     * 请你返回记录中所有得分的总和。
+     * @param ops
+     * @return
+     */
+    public int calPoints(String[] ops) {
+        int ans =0;
+        //定义一个栈用于存放数据
+        int[] stack = new int[ops.length];
+        //指针用于存放栈当前的位置
+        int pos = 0;
+        //遍历当前数组，进行判断
+        for(String str : ops){
+            //如果是c的话，则直接出栈
+            if("C".equals(str)){
+                pos--;
+            }else if("D".equals(str)){
+                //如果是d的话则直接前面那个数的两倍
+                int temp = stack[pos-1]*2;
+                stack[pos++]=temp;
+            }else if("+".equals(str)){
+                //如果是加号的话则前两个数组直接相加，这里因为题目保证前面有确定的数所以不用判断stack-2是否小于0
+                int temp = stack[pos-1]+stack[pos-2];
+                stack[pos++] = temp;
+            }else{
+                //如果是其他操作则直接入栈即可
+                int temp = Integer.parseInt(str);
+                stack[pos++]=temp;
+            }
+
+        }
+        //表里整个栈累加
+        for(int i =0 ; i<pos;i++){
+            ans +=stack[i];
+        }
+        return ans;
+    }
 }
