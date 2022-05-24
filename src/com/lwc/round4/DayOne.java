@@ -195,6 +195,8 @@ public class DayOne {
         while(!queue.isEmpty()){
             int sz = queue.size();
             step++;
+            //这先将之前入对的进行出队，以保证这一步操作完全完成确定可以对步数进行累加
+            //因为所有的下一层都算是一步
             for(int i =0 ;i<sz;i++){
                 int[] temp = queue.poll();
                 for(int[] dis: mod){
@@ -213,13 +215,60 @@ public class DayOne {
         return -1;
     }
 
+    /**
+     * 题号：965
+     * 难度：简单
+     * 时间：20220524
+     *如果二叉树每个节点都具有相同的值，那么该二叉树就是单值二叉树。
+     *
+     * 只有给定的树是单值二叉树时，才返回 true；否则返回 false。
+     *
+     */
+    public boolean isUnivalTree(TreeNode root) {
+        return midScan(root,root.val);
+    }
+    public boolean midScan(TreeNode root,int val){
+        if(root != null){
+            if(root.val != val){
+                return false;
+            }
+            return midScan(root.left,val) && midScan(root.right,val);
+        }
+        return true;
+    }
+    //合并
+    public void merge(int[] nums1, int m, int[] nums2, int n) {
+        if(n != 0){
+            int j =0;
+            for(int i =0;i<n;i++){
+                //先找到大于或等于nums2[i]的最小元素的位置
+                while(nums1[j]<nums2[i] && j<m+i){
+                    j++;
+                }
+                //将j后面的元素往后面移
+                for(int temp =m+i-1;temp>=j;temp--){
+                   nums1[temp+1] =nums1[temp];
+                }
+                nums1[j]=nums2[i];
+            }
+        }
+    }
 
     public static void main(String[] args) {
         DayOne one=new DayOne();
-        List<List<Integer>> list = new ArrayList<>();
-        list.add(Arrays.asList(new Integer[]{1, 2, 3}));
-        list.add(Arrays.asList(new Integer[]{0, 0, 4}));
-        list.add(Arrays.asList(new Integer[]{7, 6, 5}));
-        System.out.println(one.cutOffTree(list));
+        one.merge(new int[]{1,2,3,0,0,0},3,new int[]{2,5,6},3);
+        System.out.println();
     }
 }
+class TreeNode {
+    int val;
+    TreeNode left;
+    TreeNode right;
+      TreeNode() {}
+     TreeNode(int val) { this.val = val; }
+    TreeNode(int val, TreeNode left, TreeNode right) {
+        this.val = val;
+         this.left = left;
+        this.right = right;
+     }
+ }
