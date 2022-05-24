@@ -1,5 +1,7 @@
 package com.lwc.round1;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 该类旨在学习动态规划算法一下是动态规划算法的基本的步骤
@@ -1244,6 +1246,100 @@ public int maxProfit4(int[] prices) {
        }
        return res;
     }
+    /**
+     * 树型dp问题
+     * 有一棵二叉苹果树，如果树枝有分叉，一定是分两叉，即没有只有一个儿子的节点。这棵树共 NN 个节点，标号 11 至 NN，树根编号一定为 11。
+     *
+     * 我们用一根树枝两端连接的节点编号描述一根树枝的位置。一棵有四根树枝的苹果树，因为树枝太多了，需要剪枝。但是一些树枝上长有苹果，给定需要保留的树枝数量，求最多能留住多少苹果。
+     */
+    public int solution(){
+        return 0;
+
+    }
+    /**
+     * 题号：887
+     * 难度：困难
+     * 时间：20220417
+     * 给你 k 枚相同的鸡蛋，并可以使用一栋从第 1 层到第 n 层共有 n 层楼的建筑。
+     *
+     * 已知存在楼层 f ，满足 0 <= f <= n ，任何从 高于 f 的楼层落下的鸡蛋都会碎，从 f 楼层或比它低的楼层落下的鸡蛋都不会破。
+     *
+     * 每次操作，你可以取一枚没有碎的鸡蛋并把它从任一楼层 x 扔下（满足 1 <= x <= n）。如果鸡蛋碎了，你就不能再次使用它。如果某枚鸡蛋扔下后没有摔碎，则可以在之后的操作中 重复使用 这枚鸡蛋。
+     *
+     * 请你计算并返回要确定 f 确切的值 的 最小操作次数 是多少？
+     */
+    public int superEggDrop(int k, int n) {
+        //dp[i][j]表示的时第i个鸡蛋时j层楼所用的最少操作数
+        int[][] dp =new int[n+1][k+1];
+        //因为我们不确定是那层楼层是鸡蛋会碎的楼层所以所有的楼层都有可能，所以我们需要涵盖所有的情况来进行判断
+        //不妨设我们在x层丢下鸡蛋，如果丢下第i颗鸡蛋碎了那么我们可以确定的是鸡蛋少了一个而且楼层f必定是在该层之下
+        //也就是dp[i-1][x-1],如果第x层丢下的第i颗鸡蛋没有碎那么鸡蛋的个数也没有变，而且我们确定楼层f必定在n-f之间
+        //用状态表示也就是dp[i][n-x],因为我们要确定所有的情况都要包含在内以确保正确性，所以我们需要取得是这两个数之间
+        //的最大值也就是max(dp[i-1][x-1],dp[i][n-x])
+
+
+        return 0;
+    }
+    /**
+     * 题号：96
+     * 难度：中等
+     * 给你一个整数 n ，求恰由 n 个节点组成且节点值从 1 到 n 互不相同的 二叉搜索树 有多少种？返回满足题意的二叉搜索树的种数。
+     */
+    public int numTrees(int n) {
+        //dp[i]表示节点个数为i个时所拥有的二叉树的种数
+        int[] dp = new int[n+1];
+        //初始化动态数组
+        dp[1]=1;
+        for(int i=2;i<dp.length;i++){
+            //首先对于单支树
+            dp[i]=2*dp[i-1];
+            //其次对于有左右子树的树
+            for(int j=1;j<i-1;j++){
+                dp[i] += dp[j]*dp[i-1-j];
+            }
+        }
+        return dp[n];
+    }
+
+    /**
+     * 题号：95
+     * 难度：中等
+     * 时间：20220517
+     * 给你一个整数 n ，请你生成并返回所有由 n 个节点组成且节点值从 1 到 n 互不相同的不同 二叉搜索树 。可以按 任意顺序 返回答案。
+     */
+    public List<TreeNode> generateTrees(int n) {
+        if(n <1){
+           return null;
+        }
+        List<TreeNode> ans = buildTree(1,n);
+       return ans;
+    }
+    public List<TreeNode> buildTree(int start , int end ){
+        List<TreeNode> ans = new ArrayList<>();
+        if(end == start){
+            ans.add(new TreeNode(end));
+            return ans;
+        }else if(end <start ){
+            ans.add(null);
+            return ans;
+        }
+        //枚举所有的根节点
+        for(int i =start;i<=end ;i++){
+            List<TreeNode> leftNodes =buildTree(start,i-1);
+            List<TreeNode> rightNodes =buildTree(i+1,end);
+            for(TreeNode leftNode:leftNodes){
+                for(TreeNode rightNode:rightNodes){
+                    TreeNode node =new TreeNode(i);
+                    node.left=leftNode;
+                    node.right=rightNode;
+                    ans .add(node);
+                }
+            }
+        }
+     return ans;
+
+    }
+
 
 }
 
