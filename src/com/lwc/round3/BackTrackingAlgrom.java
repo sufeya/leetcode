@@ -48,4 +48,82 @@ public class BackTrackingAlgrom {
             res.add(sb.toString());
         }
     }
+    /**
+     * 题号:51
+     * 难度：困难
+     * 时间：20220412
+     * n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，并且使皇后彼此之间不能相互攻击。
+     *
+     * 给你一个整数 n ，返回所有不同的 n 皇后问题 的解决方案。
+     *
+     * 每一种解法包含一个不同的 n 皇后问题 的棋子放置方案，该方案中 'Q' 和 '.' 分别代表了皇后和空位。
+     * 分析：n皇后问题指的是其中q同一行同一列不能拥有一个q解决对应的问题，即可，可以采用回溯法进行枚举判断
+     * 可以按照顺序每一行先确定一个皇后所在的位置，然后在确定其他的位置进行判断即可
+     */
+    static List<List<String>> ans =new ArrayList<>();
+    public List<List<String>> solveNQueens(int n) {
+        StringBuffer sb = new StringBuffer();
+        //初始化棋盘
+        for(int i =0 ;i<n ;i++){
+            sb.append('.');
+        }
+        List<String> board = new ArrayList<>();
+        for(int i =0 ;i<n ;i++){
+            board.add(sb.toString());
+        }
+        backTrackSolveQ(n,0,new HashSet<Integer>(),board);
+        return ans;
+    }
+    public void backTrackSolveQ(int n,int level,Set<Integer> col,List<String> board ){
+        if(level < n){
+            //获取对应的层次数字符串进行改编
+            String str =board.get(level);
+            //因为我们是按照每一行进行遍历的所有可以确定的是该行之前一定没有q
+            for(int i=0;i<n;i++){
+                //如果该列存在皇后则直接进行剪枝
+                if(col.contains(i)){
+                    continue;
+                }
+
+                //对角存在也要进行剪枝,由于是一行一行进行添加，所以只需要判断两个对角即可
+                if(!isValid(board,level,i)){
+                    continue;
+                }
+
+                str = str.substring(0,i)+'Q'+str.substring(i,str.length()-1);
+                board.set(level,str);
+                col.add(i);
+                backTrackSolveQ(n,level+1,col,board);
+                //进行回溯
+                str = str.replace('Q','.');
+                board.set(level,str);
+                col.remove(i);
+            }
+        }else{
+            List<String> temp = new ArrayList<>();
+            for(String str :board){
+                temp.add(str);
+            }
+            ans.add(temp);
+        }
+
+    }
+    //判断同一对角线上是否具有相同的q
+    public boolean isValid(List<String> board ,int level,int i){
+        for(int n = 0;n<=level;n++){
+            String str = board.get(level-n);
+            if(i-n>=0){
+                if(str.charAt(i-n) == 'Q'){
+                    return false;
+                }
+            }
+            if(i+n<str.length()){
+                if(str.charAt(i+n) == 'Q'){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
 }
