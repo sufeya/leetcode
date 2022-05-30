@@ -556,10 +556,7 @@ public int maxProfit3(int[] prices) {
 
  * 解题：
  */
-public static void main(String[] args) {
-    DynamicProgramming dp=new DynamicProgramming();
-    System.out.println(dp.maxSumOfThreeSubarrays(new int[]{17,8,14,11,13,9,4,19,20,6,1,20,6,5,19,8,5,16,20,17},5));
-}
+
 public int maxProfit4(int[] prices) {
     //dp[i][0]表示的是第一买操作时获取的最大利润值，同理dp[i][1],dp[i][2],dp[i][3],均对应上述的各个状态
     int[][] dp=new int[prices.length][4];
@@ -1347,8 +1344,51 @@ public int maxProfit4(int[] prices) {
      *
      * 回文串 是正着读和反着读都一样的字符串。
      */
+    int len;
+    boolean[][] dp;
+    List<List<String>> res = new ArrayList<>();
+    List<String> ans = new ArrayList<>();
     public List<List<String>> partition(String s) {
-        return null;
+        len = s.length();
+        //设置二维数组其中dp[i][j]表示的是由i到j组成的字符串是回文字符串
+        dp = new boolean[len][len];
+        //对dp数组进行初始化可以确定一个字符的一定是回文字符串
+        for(int i =0;i<len;i++){
+            dp[i][i]=true;
+        }
+        for(int i =len-1 ;i>=0;i--){
+            for(int j =i+1;j<len;j++){
+                if(dp[i][j]){
+                    continue;
+                }
+                if(j-1>=0 && i+1<len && i+1<j-1){
+                    dp[i][j]=((s.charAt(j) == s.charAt(i)) && dp[i+1][j-1]);
+                }else if(j-1>=0 && i+1<len && j-1<=i+1){
+                    dp[i][j]=(s.charAt(j) == s.charAt(i))&&true;
+                }
+            }
+        }
+        backTrace(s,0);
+        return res;
+    }
+    //回溯法进行遍历所有的可能
+    public void backTrace(String s ,int pos){
+        if(pos == len){
+            res.add(new ArrayList<>(ans));
+            return;
+        }
+        for(int i =pos ;i<len ;i++){
+            if(dp[pos][i]){
+                ans.add(s.substring(pos,i+1));
+                backTrace(s,i+1);
+                ans.remove(ans.size()-1);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        DynamicProgramming dp = new DynamicProgramming();
+        dp.partition( "aab");
     }
 }
 
