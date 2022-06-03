@@ -3,6 +3,8 @@ package com.lwc.round4;
 import java.util.*;
 
 public class DayTwo {
+    private boolean vaild1;
+
     /**
      * 题号：467
      * 难度：中等
@@ -237,22 +239,216 @@ public class DayTwo {
             dfs(root.right,temp);
         }
     }
+
+    /**
+     * 题号：剑指offer II 114
+     * 题号：困难
+     * 时间：20220531
+     *现有一种使用英语字母的外星文语言，这门语言的字母顺序与英语顺序不同。
+     *
+     * 给定一个字符串列表 words ，作为这门语言的词典，words 中的字符串已经 按这门新语言的字母顺序进行了排序 。
+     *
+     * 请你根据该词典还原出此语言中已知的字母顺序，并 按字母递增顺序 排列。若不存在合法字母顺序，返回 "" 。若存在多种可能的合法字母顺序，返回其中 任意一种 顺序即可。
+     *
+     * 字符串 s 字典顺序小于 字符串 t 有两种情况：
+     *
+     * 在第一个不同字母处，如果 s 中的字母在这门外星语言的字母顺序中位于 t 中字母之前，那么 s 的字典顺序小于 t 。
+     * 如果前面 min(s.length, t.length) 字母都相同，那么 s.length < t.length 时，s 的字典顺序也小于 t 。
+     */
+    //构建对应的有向图
+    Map<Character,List<Character>> charOrder =new HashMap<>();
+    //判断节点是否入度为零
+    Map<Character,Integer> indegree = new HashMap<>();
+    //判断是否有合法的字符序
+    boolean vaild =true;
+    public String alienOrder(String[] words) {
+        StringBuilder sb = new StringBuilder();
+        //跟据所给的单词构建图进行遍历
+        //对图进行初始化
+        for(String word:words){
+            int len =word.length();
+            for(int i=0;i<len;i++){
+                charOrder.putIfAbsent(word.charAt(i),new ArrayList<Character>());
+            }
+        }
+        //遍历所有的字符进行加边，跟据相邻两个单词间的顺序可以直到字符序例如wet,wer 可以确定t->r之间
+        //有一条有向边
+        for(int i =1;i<words.length && vaild;i++){
+            addEdge(words[i-1],words[i]);
+        }
+        if(!vaild){
+            return "";
+        }
+        //利用广度遍历对图进行拓扑排序
+        Queue<Character> queue=new ArrayDeque<>();
+        //先将入度为零的进行入队
+        for(char c : charOrder.keySet()){
+            if(!indegree.containsKey(c)){
+                queue.offer(c);
+            }
+        }
+        while(!queue.isEmpty()){
+            char c = queue.poll();
+            sb.append(c);
+            List<Character> list=charOrder.get(c);
+            for(char m :list){
+              int i = indegree.get(m)-1;
+              if(i == 0){
+                  queue.offer(m);
+              }else{
+                  indegree.put(m,i);
+              }
+            }
+        }
+        return sb.length() == charOrder.size() ? sb.toString():"";
+    }
+    public void addEdge(String word1,String word2){
+        int len = Math.min(word1.length(),word2.length());
+        int index =0;
+       while(index<len){
+           char before = word1.charAt(index),after =word2.charAt(index);
+           //如果两个对应的字符不相同则可以确定一个字符序
+           if(before != after){
+               //增加对应的边
+               charOrder.get(before).add(after);
+               //增加after对应的入度
+               indegree.put(after,indegree.getOrDefault(after,0)+1);
+               break;
+           }
+           index++;
+       }
+       if(index == len && word1.length()>word2.length() ){
+          vaild=false;
+       }
+    }
+
+    /**
+     * 题号：473
+     * 难度：中等
+     * 时间：20220601
+     *你将得到一个整数数组 matchsticks ，其中 matchsticks[i] 是第 i 个火柴棒的长度。你要用 所有的火柴棍 拼成一个正方形。你 不能折断 任何一根火柴棒，但你可以把它们连在一起，而且每根火柴棒必须 使用一次 。
+     *
+     * 如果你能使这个正方形，则返回 true ，否则返回 false 。
+     */
+    public boolean makesquare(int[] matchsticks) {
+        int length = matchsticks.length;
+        //首先如果可以拼成正方形，则可以确定边长的长度
+        int sum =0;
+        for(int i : matchsticks){
+            sum+=i;
+        }
+        int len = sum/4;
+        //如果边长不能等分则说明不行
+        if(len *4 != sum){
+            return false;
+        }
+        //dp[s]表示的是用完s表示的火柴所组成的边的长度当刚好拼满当前的边时则重置为零
+        //没拼满时则接着遍历所有的火柴寻找，也就是遍历所有的情况
+        int dp[] = new int[1<<length];
+        Arrays.fill(dp,-1);
+        dp[0]= 0;
+        for(int i =1;i<(1<<length);i++){
+            for(int j =0 ;j<length;j++){
+                //如果第j根火柴没有使用过则跳过
+                if(((i>>j)&1) == 0){
+                    continue;
+                }
+                //找到没有使用第j根火柴的状态
+                int pre = i ^(1<<j);
+                if(dp[pre]>=0 && dp[pre] +matchsticks[j]<=len){
+                    //当刚好为零时则表明已经填满了上一边长
+                    dp[i] = (dp[pre]+matchsticks[j])%len;
+                    break;
+                }
+            }
+        }
+        return dp[(1<<length)-1] == 0;
+    }
+    //回溯解法
+    public boolean makesquare2(int[] matchsticks) {
+        int length = matchsticks.length;
+        //首先如果可以拼成正方形，则可以确定边长的长度
+        int sum =0;
+        for(int i : matchsticks){
+            sum+=i;
+        }
+        int len = sum/4;
+        //如果边长不能等分则说明不行
+        if(len *4 != sum){
+            return false;
+        }
+        //将数组进行从大到小进行排序
+        Arrays.sort(matchsticks);
+        for (int i = 0, j = matchsticks.length - 1; i < j; i++, j--) {
+            int temp = matchsticks[i];
+            matchsticks[i] = matchsticks[j];
+            matchsticks[j] = temp;
+        }
+
+        //四条边的值，遍历所有的边累加到四条边中
+        int edges[] = new int[4];
+
+        return dfs(edges,len,0,matchsticks);
+    }
+    public boolean dfs(int[] edges,int len,int index,int[] matchsticks){
+        if(index == matchsticks.length){
+            return true;
+        }
+        for(int i = 0;i<4;i++){
+            edges[i]+=matchsticks[index];
+            if(edges[i]<=len && dfs(edges,len,index+1,matchsticks)){
+                return true;
+            }
+            edges[i]-=matchsticks[index];
+        }
+        return false;
+    }
+
+    /**
+     * 题号：450
+     * 难度：中等
+     * 时间：20220602
+     * 给定一个二叉搜索树的根节点 root 和一个值 key，删除二叉搜索树中的 key 对应的节点，并保证二叉搜索树的性质不变。返回二叉搜索树（有可能被更新）的根节点的引用。
+     *
+     * 一般来说，删除节点可分为两个步骤：
+     *
+     * 首先找到需要删除的节点；
+     * 如果找到了，删除它。
+     */
+    public TreeNode deleteNode(TreeNode root, int key) {
+        if(root == null ){
+            return null;
+        }
+        if(root.val == key){
+            if(root.right == null ){
+                return root.left;
+            }
+            if(root.left == null){
+                return root.right;
+            }
+            TreeNode p = root.left;
+            while(p.right != null){
+                p=p.right;
+            }
+            p.right=root.right;
+            return root.left;
+        }else if(root.val <key){
+            root.right=deleteNode(root.right,key);
+        }else{
+            root.left=deleteNode(root.left,key);
+        }
+        return root;
+    }
+
     public static void main(String[] args) {
-        TreeMap map = new TreeMap();
-        TreeNode node1= new TreeNode(1);
-        TreeNode node2= new TreeNode(0);
-        TreeNode node3= new TreeNode(0);
-        TreeNode node4= new TreeNode(1);
-        TreeNode node5= new TreeNode(1);
-        TreeNode node6= new TreeNode(0);
-        TreeNode node7= new TreeNode(1);
-        node1.left =node2;
-        node2.left=node3;
+        TreeNode node1 =new TreeNode(1);
+        TreeNode node2 =new TreeNode(2);
+        TreeNode node3 =new TreeNode(3);
+        TreeNode node4 =new TreeNode(4);
+        node3.left =node1;
         node2.right=node4;
-        node1.right=node5;
-        node5.left=node6;
-        node5.right=node7;
+        node1.right=node2;
         DayTwo to= new DayTwo();
-        System.out.println(to.sumRootToLeaf(node1));
+        System.out.println(to.deleteNode(node3,1));
     }
 }
