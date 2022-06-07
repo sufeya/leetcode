@@ -1386,9 +1386,36 @@ public int maxProfit4(int[] prices) {
         }
     }
 
+    /**
+     * 题号：45
+     * 难度：中等
+     * 时间：20220605
+     *给你一个非负整数数组 nums ，你最初位于数组的第一个位置。
+     *
+     * 数组中的每个元素代表你在该位置可以跳跃的最大长度。
+     *
+     * 你的目标是使用最少的跳跃次数到达数组的最后一个位置。
+     *
+     * 假设你总是可以到达数组的最后一个位置。
+     */
+    public int jump(int[] nums) {
+        int len =nums.length;
+        //其中dp[i]表示的是由位置i到末位的移动步数
+        int[] dp =new int[len];
+        Arrays.fill(dp,10001);
+        dp[len-1] =0;
+        for(int i =len -2;i>=0;i--){
+            int temp = nums[i];
+            for(int j =1;j<=temp && j+i<=len-1;j++){
+                dp[i]=Math.min(dp[i],dp[i+j]+1);
+            }
+        }
+        return dp[0];
+    }
+
     public static void main(String[] args) {
         DynamicProgramming dp = new DynamicProgramming();
-        dp.partition( "aab");
+        dp.jump(new int[]{2,3,1,1,4});
     }
 }
 
