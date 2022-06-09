@@ -244,20 +244,8 @@ public class DayThree {
         return true;
     }
 
-    /**
-     * 题号：732
-     * 难度：困难
-     * 时间：20220606
-     *当 k 个日程安排有一些时间上的交叉时（例如 k 个日程安排都在同一时间内），就会产生 k 次预订。
-     *
-     * 给你一些日程安排 [start, end) ，请你在每个日程安排添加后，返回一个整数 k ，表示所有先前日程安排会产生的最大 k 次预订。
-     *
-     * 实现一个 MyCalendarThree 类来存放你的日程安排，你可以一直添加新的日程安排。
-     *
-     * MyCalendarThree() 初始化对象。
-     * int book(int start, int end) 返回一个整数 k ，表示日历中存在的 k 次预订的最大值。
-     *
-     */
+
+
     /**
      * 题号：875
      * 难度：中等
@@ -272,13 +260,215 @@ public class DayThree {
      *
      */
     public int minEatingSpeed(int[] piles, int h) {
-        return 0;
+        //通过二分查找对速度进行查找，可知最大的速度阈值为最大香蕉的个数，但是这个最小值
+        //最小值应当为所有香蕉累加的速度
+        long right = 0;
+        long left=0;
+        for(int i : piles){
+            right= Math.max(i,right);
+            left+=i;
+        }
+        left= (left/h)*h<left ?(left/h)+1:(left/h);
+        while(left<right){
+            long mid = left +(right-left>>1);
+            //计算在该速度下真正的时间
+            int time=0;
+            for(int i:piles){
+                time+=(i/mid)*mid <i ?(i/mid)+1:(i/mid);
+            }
+            if(time>h){
+                left=mid+1;
+            }else{
+                right=mid;
+            }
+        }
+        return (int)right;
     }
+
+    /**
+     * 题号：1037
+     * 难度：简单
+     * 时间：20220608
+     *给定一个数组 points ，其中 points[i] = [xi, yi] 表示 X-Y 平面上的一个点，如果这些点构成一个 回旋镖 则返回 true 。
+     *
+     * 回旋镖 定义为一组三个点，这些点 各不相同 且 不在一条直线上 。
+     */
+    public boolean isBoomerang(int[][] points) {
+        //向量叉积，判断是否为零，为零则共线
+        int[] v1 = {points[1][0] - points[0][0], points[1][1] - points[0][1]};
+        int[] v2 = {points[2][0] - points[0][0], points[2][1] - points[0][1]};
+        return v1[0] * v2[1] - v1[1] * v2[0] != 0;
+    }
+
+
     public static void main(String[] args) {
         DayThree three = new DayThree();
-        int[][] c = new int[][]{{10,20},{15,25},{20,30}};
-        for(int[] temp :c){
-            System.out.println(three.book(temp[0],temp[1]));
+        MyCalendarThree mc= new MyCalendarThree();
+        int[][] temp = new int[][]{{47,50},{1,10},{27,36},{40,47},{20,27},{15,23},{10,18},{27,36},{17,25},{8,17},{24,33},{23,28},{21,27},{47,50},{14,21},{26,32},{16,21},{2,7},{24,33},{6,13},{44,50},{33,39},{30,36},{6,15},{21,27},{49,50},{38,45},{4,12},{46,50},{13,21}};
+        for(int[] i :temp){
+            System.out.println(mc.book(i[0],i[1]));
         }
+//23 26
+
     }
 }
+/**
+ * 题号：732
+ * 难度：困难
+ * 时间：20220606
+ *当 k 个日程安排有一些时间上的交叉时（例如 k 个日程安排都在同一时间内），就会产生 k 次预订。
+ *
+ * 给你一些日程安排 [start, end) ，请你在每个日程安排添加后，返回一个整数 k ，表示所有先前日程安排会产生的最大 k 次预订。
+ *
+ * 实现一个 MyCalendarThree 类来存放你的日程安排，你可以一直添加新的日程安排。
+ *
+ * MyCalendarThree() 初始化对象。
+ * int book(int start, int end) 返回一个整数 k ，表示日历中存在的 k 次预订的最大值。
+ * 有bug还未修复
+ *
+ */
+class MyCalendarThree {
+    int max;
+    Node node;
+    int N = (int)1e9+1;
+    class Node {
+        int count =0,lazy=0,left=0,right=0;
+        Node rNode,lNode;
+        public Node(int left,int right){
+            this.left=left;
+            this.right=right;
+        }
+        public Node(){
+
+        }
+    }
+    public void update(Node root,int start,int end){
+        int rr=root.right,rl=root.left;
+        if(start<=rl && rr<=end){
+            root.count++;
+            root.lazy=1;
+            return;
+        }
+        int mid = rl+(rr-rl>>1);
+        createNode(root,rl,rr,mid);
+        if(root.lazy == 1){
+            pushDown(root);
+        }
+        if(mid>=start){
+            update(root.lNode,start,end);
+        }
+        if(end>mid){
+           update(root.rNode,start,end);
+        }
+        pushUp(root,start,end);
+    }
+    public int query(Node root,int start ,int end){
+        int rr=root.right,rl=root.left;
+        if(start<=rl && rr<=end){
+            return root.count;
+        }
+        int mid = rl +(rr-rl>>1);
+        createNode(root,rl,rr,mid);
+        if(root.lazy == 1){
+            pushDown(root);
+        }
+        int count =0;
+       if(mid>=start){
+          count= query(root.lNode,start,end);
+       }
+       if(mid<end){
+           count = Math.max(count,query(root.rNode,start,end));
+       }
+        return count;
+    }
+    public void createNode(Node root,int left,int right,int mid){
+        if(root == null){
+            root = new Node(left,right);
+        }
+        if(root.lNode == null){
+            root.lNode= new Node(left,mid);
+        }
+        if(root.rNode==null){
+            root.rNode=new Node(mid+1,right);
+        }
+    }
+    //将懒标记下推
+    public void pushDown(Node root){
+        root.lNode.count++;
+        root.lNode.lazy++;
+        root.rNode.lazy++;
+        root.rNode.count++;
+        root.lazy--;
+    }
+    public void pushUp(Node root,int start ,int end){
+        root.count=Math.max(root.lNode.count,root.rNode.count);
+    }
+    public int book(int start ,int end){
+        update(node,start,end-1);
+        max = Math.max(query(node,start,end-1),max);
+        return max;
+    }
+    public MyCalendarThree(){
+            max=0;
+         node= new Node(0,N);
+    }
+}
+class MyCalendarThree2 {
+    class Node {
+        int ls, rs, add, max;
+        int left,right;
+    }
+    int N = (int)1e9, M = 4 * 400 * 20, cnt = 1;
+    Node[] tr = new Node[M];
+    void update(int u, int lc, int rc, int l, int r, int v) {
+        if (l <= lc && rc <= r) {
+            tr[u].add += v;
+            tr[u].max += v;
+            return ;
+        }
+        lazyCreate(u,lc,rc);
+        pushdown(u);
+        int mid = lc + rc >> 1;
+        if (l <= mid) update(tr[u].ls, lc, mid, l, r, v);
+        if (r > mid) update(tr[u].rs, mid + 1, rc, l, r, v);
+        pushup(u);
+    }
+    int query(int u, int lc, int rc, int l, int r) {
+        if (l <= lc && rc <= r) return tr[u].max;
+        lazyCreate(u,lc,rc);
+        pushdown(u);
+        int mid = lc + rc >> 1, ans = 0;
+        if (l <= mid) ans = query(tr[u].ls, lc, mid, l, r);
+        if (r > mid) ans = Math.max(ans, query(tr[u].rs, mid + 1, rc, l, r));
+        return ans;
+    }
+    void lazyCreate(int u,int left,int right) {
+        int mid= left+(right-left>>1);
+        if (tr[u] == null) tr[u] = new Node();
+        if (tr[u].ls == 0) {
+            tr[u].ls = ++cnt;
+            tr[tr[u].ls] = new Node();
+            tr[tr[u].ls].left=left;
+            tr[tr[u].ls].right=mid;
+        }
+        if (tr[u].rs == 0) {
+            tr[u].rs = ++cnt;
+            tr[tr[u].rs] = new Node();
+            tr[tr[u].rs].left=mid+1;
+            tr[tr[u].rs].right=right;
+        }
+    }
+    void pushdown(int u) {
+        tr[tr[u].ls].add += tr[u].add; tr[tr[u].rs].add += tr[u].add;
+        tr[tr[u].ls].max += tr[u].add; tr[tr[u].rs].max += tr[u].add;
+        tr[u].add = 0;
+    }
+    void pushup(int u) {
+        tr[u].max = Math.max(tr[tr[u].ls].max, tr[tr[u].rs].max);
+    }
+    public int book(int start, int end) {
+        update(1, 1, N + 1, start + 1, end, 1);
+        return query(1, 1, N + 1, 1, N + 1);
+    }
+}
+
