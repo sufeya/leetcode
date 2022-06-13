@@ -358,6 +358,8 @@ public class DayFour {
         int[] arr = new int[]{1,1,4,2,1,3};
         four.quickSort(arr);
        for(int i :arr){
+
+           //test
            System.out.println(i);
        }
 
