@@ -1149,6 +1149,8 @@ public int maxProfit4(int[] prices) {
                 }else{
                     dp[i][j]=(dp[i+1][j]+dp[i][j-1]-dp[i+1][j-1])%mod;
                 }
+                //可能会操作表示范围然后导致负数
+                dp[i][j] = (dp[i][j]>=0) ? dp[i][j] % mod : dp[i][j]+mod;
             }
         }
         return dp[0][s.length()-1];
