@@ -353,15 +353,57 @@ public class DayFour {
         }
     }
 
+    /**
+     * 题号：498
+     * 难度：中等
+     * 时间：20220614
+     *给你一个大小为 m x n 的矩阵 mat ，请以对角线遍历的顺序，用一个数组返回这个矩阵中的所有元素。
+     */
+    public int[] findDiagonalOrder(int[][] mat) {
+        int round=0,len=(mat.length)*mat[0].length,n=mat.length,m=mat[0].length;
+        int[] ans = new int[len];
+        int x=0,y=0;
+        for(int i =0;i<len;i++){
+            if(x>=0 && x<m &&y>=0 && y<n){
+                ans[i]=mat[y][x];
+            }
+            //轮下一个
+            if(round%2 == 0){
+                if(y-1<0 ||x+1>=m){
+                    if( x+1<m){
+                        x=x+1;
+                    }else{
+                        if(y+1<n){
+                            y=y+1;
+                        }else{
+
+                        }
+                    }
+                    round++;
+                }else{
+                    x=x+1;
+                    y=y-1;
+                }
+            }else{
+                if(x-1<0 ||y+1>=n){
+                    if(x-1<0 && y+1<n){
+                        y=y+1;
+                    }else{
+                        x=x+1;
+                    }
+                    round++;
+                }else{
+                    x=x-1;
+                    y=y+1;
+                }
+            }
+        }
+        return ans;
+    }
     public static void main(String[] args) {
         DayFour four = new DayFour();
-        int[] arr = new int[]{1,1,4,2,1,3};
-        four.quickSort(arr);
-       for(int i :arr){
-
-           //test
-           System.out.println(i);
-       }
+        int[][] arr = new int[][]{{2,3}};
+        four.findDiagonalOrder(arr);
 
     }
 }
