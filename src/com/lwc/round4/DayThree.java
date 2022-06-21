@@ -324,7 +324,6 @@ public class DayThree {
  *
  * MyCalendarThree() 初始化对象。
  * int book(int start, int end) 返回一个整数 k ，表示日历中存在的 k 次预订的最大值。
- * 有bug还未修复
  *
  */
 class MyCalendarThree {
@@ -346,19 +345,19 @@ class MyCalendarThree {
         int rr=root.right,rl=root.left;
         if(start<=rl && rr<=end){
             root.count++;
-            root.lazy=1;
+            root.lazy+=1;
             return;
         }
         int mid = rl+(rr-rl>>1);
         createNode(root,rl,rr,mid);
-        if(root.lazy == 1){
-            pushDown(root);
-        }
+
+        pushDown(root);
+
         if(mid>=start){
             update(root.lNode,start,end);
         }
         if(end>mid){
-           update(root.rNode,start,end);
+            update(root.rNode,start,end);
         }
         pushUp(root,start,end);
     }
@@ -369,16 +368,16 @@ class MyCalendarThree {
         }
         int mid = rl +(rr-rl>>1);
         createNode(root,rl,rr,mid);
-        if(root.lazy == 1){
-            pushDown(root);
-        }
+
+        pushDown(root);
+
         int count =0;
-       if(mid>=start){
-          count= query(root.lNode,start,end);
-       }
-       if(mid<end){
-           count = Math.max(count,query(root.rNode,start,end));
-       }
+        if(mid>=start){
+            count= query(root.lNode,start,end);
+        }
+        if(mid<end){
+            count = Math.max(count,query(root.rNode,start,end));
+        }
         return count;
     }
     public void createNode(Node root,int left,int right,int mid){
@@ -394,81 +393,22 @@ class MyCalendarThree {
     }
     //将懒标记下推
     public void pushDown(Node root){
-        root.lNode.count++;
-        root.lNode.lazy++;
-        root.rNode.lazy++;
-        root.rNode.count++;
-        root.lazy--;
+        root.lNode.count+=root.lazy;
+        root.lNode.lazy+=root.lazy;
+        root.rNode.lazy+=root.lazy;
+        root.rNode.count+=root.lazy;
+        root.lazy=0;
     }
     public void pushUp(Node root,int start ,int end){
         root.count=Math.max(root.lNode.count,root.rNode.count);
     }
     public int book(int start ,int end){
         update(node,start,end-1);
-        max = Math.max(query(node,start,end-1),max);
-        return max;
+        return node.count;
     }
     public MyCalendarThree(){
-            max=0;
-         node= new Node(0,N);
-    }
-}
-class MyCalendarThree2 {
-    class Node {
-        int ls, rs, add, max;
-        int left,right;
-    }
-    int N = (int)1e9, M = 4 * 400 * 20, cnt = 1;
-    Node[] tr = new Node[M];
-    void update(int u, int lc, int rc, int l, int r, int v) {
-        if (l <= lc && rc <= r) {
-            tr[u].add += v;
-            tr[u].max += v;
-            return ;
-        }
-        lazyCreate(u,lc,rc);
-        pushdown(u);
-        int mid = lc + rc >> 1;
-        if (l <= mid) update(tr[u].ls, lc, mid, l, r, v);
-        if (r > mid) update(tr[u].rs, mid + 1, rc, l, r, v);
-        pushup(u);
-    }
-    int query(int u, int lc, int rc, int l, int r) {
-        if (l <= lc && rc <= r) return tr[u].max;
-        lazyCreate(u,lc,rc);
-        pushdown(u);
-        int mid = lc + rc >> 1, ans = 0;
-        if (l <= mid) ans = query(tr[u].ls, lc, mid, l, r);
-        if (r > mid) ans = Math.max(ans, query(tr[u].rs, mid + 1, rc, l, r));
-        return ans;
-    }
-    void lazyCreate(int u,int left,int right) {
-        int mid= left+(right-left>>1);
-        if (tr[u] == null) tr[u] = new Node();
-        if (tr[u].ls == 0) {
-            tr[u].ls = ++cnt;
-            tr[tr[u].ls] = new Node();
-            tr[tr[u].ls].left=left;
-            tr[tr[u].ls].right=mid;
-        }
-        if (tr[u].rs == 0) {
-            tr[u].rs = ++cnt;
-            tr[tr[u].rs] = new Node();
-            tr[tr[u].rs].left=mid+1;
-            tr[tr[u].rs].right=right;
-        }
-    }
-    void pushdown(int u) {
-        tr[tr[u].ls].add += tr[u].add; tr[tr[u].rs].add += tr[u].add;
-        tr[tr[u].ls].max += tr[u].add; tr[tr[u].rs].max += tr[u].add;
-        tr[u].add = 0;
-    }
-    void pushup(int u) {
-        tr[u].max = Math.max(tr[tr[u].ls].max, tr[tr[u].rs].max);
-    }
-    public int book(int start, int end) {
-        update(1, 1, N + 1, start + 1, end, 1);
-        return query(1, 1, N + 1, 1, N + 1);
+        max=0;
+        node= new Node(0,N);
     }
 }
 

@@ -175,7 +175,16 @@ public class DayFour {
      * 说明：你不能倾斜容器。
      */
     public int maxArea(int[] height) {
-        return 0;
+        int ans =0,len =height.length,left=0,right=len-1;
+       while(right>left){
+           ans=Math.max((right-left)*Math.min(height[right],height[left]),ans);
+           if(height[right]<height[left]){
+               right--;
+           }else{
+               left++;
+           }
+       }
+        return ans;
     }
     /**
      * 题号：926
