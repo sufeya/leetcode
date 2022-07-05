@@ -212,23 +212,155 @@ public class DayFive {
         return address.replace(".","[.]");
     }
 
+    /**
+     * 题号：513
+     * 难度：中等
+     * 时间：20220622
+     * 给定一个二叉树的 根节点 root，请找出该二叉树的 最底层 最左边 节点的值。
+     *
+     * 假设二叉树中至少有一个节点。
+     */
+    int MAX_SIZE = (int)1e4+1;
+    public int findBottomLeftValue(TreeNode root) {
+        //直接使用层次遍历既可以找到最后那一层最左边的节点值
+        TreeNode[] queue = new TreeNode[MAX_SIZE];
+        int top=0,bottom = 0;
+        queue[bottom++]= root;
+        TreeNode begin = root,end;
+        int size =0,preSize=0;
+        while(top != bottom){
+            TreeNode p = queue[top++];
+            size++;
+            end = p;
+            if(p.left != null ){
+                queue[bottom++]=p.left;
+            }
+            if(p.right != null){
+                queue[bottom++] = p.right;
+            }
+            if(end == begin){
+                begin = queue[bottom-1];
+                preSize = size;
+                size=0;
+            }
+        }
+        return queue[bottom-preSize].val;
+    }
+
+    /**
+     * 题号：30
+     * 难度：困难
+     * 时间：20220623
+     *给定一个字符串 s 和一些 长度相同 的单词 words 。找出 s 中恰好可以由 words 中所有单词串联形成的子串的起始位置。
+     *
+     * 注意子串要与 words 中的单词完全匹配，中间不能有其他字符 ，但不需要考虑 words 中单词串联的顺序。
+     * 可以利用回溯法穷举范围内所有可能形成的结果然后去跟在窗口中的字符串进行匹配如果
+     */
+    List<Integer> ans =new ArrayList<>();
+    public List<Integer> findSubstring(String s, String[] words) {
+        //int[] used =new int[words.length];
+        int len = words[0].length()*words.length,m = words[0].length();
+        Map<String,Integer> map = new HashMap<>();
+        for(String word:words){
+            map.put(word,map.getOrDefault(word,0)+1);
+        }
+        out:for(int i =0;i+len<=s.length();i++){
+           String temp = s.substring(i,i+len);
+           Map<String ,Integer> cur = new HashMap<>();
+           for(int j =0;j+m<=temp.length();j+=m){
+               String temp2 = temp.substring(j,j+m);
+               //如果有word中不包含字符则直接剪枝,跳到最外层循环
+                if(!map.containsKey(temp2)){
+                    continue  out;
+                }
+                cur.put(temp2,cur.getOrDefault(temp2,0)+1);
+           }
+           if(cur.equals(map)){
+               ans.add(i);
+           }
+        }
+        return ans;
+    }
+    public void dfs(String[] words,int[] used,StringBuffer sb,int deep,int len,String str,int index){
+        if(deep == len){
+            if(str.equals(sb.toString()) && !ans.contains(index)){
+                ans.add(index);
+            }
+            return;
+        }
+        for(int i =0 ;i<words.length;i++){
+            if(used[i] == 1){
+                continue;
+            }
+            sb.append(words[i]);
+            used[i]=1;
+            dfs(words,used,sb,deep+1,len,str,index);
+            used[i]=0;
+            sb=sb.delete(sb.length()-words[i].length(),sb.length());
+        }
+    }
+
+    /**
+     *  题号：515
+     *  难度：中等
+     *  时间：20220624
+     *给定一棵二叉树的根节点 root ，请找出该二叉树中每一层的最大值。
+     */
+    public List<Integer> largestValues(TreeNode root) {
+
+        Queue<TreeNode> queue = new ArrayDeque<>();
+        List<Integer> ans =new ArrayList<>();
+        if(root == null){
+            return ans;
+        }
+        queue.offer(root);
+        while(!queue.isEmpty()){
+            int size = queue.size();
+            int max =Integer.MIN_VALUE;
+            while(size>0){
+               TreeNode  p = queue.poll();
+               max = Math.max(p.val,max);
+               size--;
+               if(p.right != null){
+                   queue.offer(p.right);
+               }
+               if(p.left != null){
+                   queue.offer(p.left);
+               }
+            }
+            ans.add(max);
+        }
+        return ans;
+    }
+
+    /**
+     * 题号：offer 91
+     * 难度：中等
+     * 时间：20220625
+     * 假如有一排房子，共 n 个，每个房子可以被粉刷成红色、蓝色或者绿色这三种颜色中的一种，你需要粉刷所有的房子并且使其相邻的两个房子颜色不能相同。
+     *
+     * 当然，因为市场上不同颜色油漆的价格不同，所以房子粉刷成不同颜色的花费成本也是不同的。每个房子粉刷成不同颜色的花费是以一个 n x 3 的正整数矩阵 costs 来表示的。
+     *
+     * 例如，costs[0][0] 表示第 0 号房子粉刷成红色的成本花费；costs[1][2] 表示第 1 号房子粉刷成绿色的花费，以此类推。
+     *
+     * 请计算出粉刷完所有房子最少的花费成本。
+     */
+    public int minCost(int[][] costs) {
+        int len = costs.length;
+        //其中dp[i][0]表示的是第i个房子粉刷成红色前0-i个房子的最小费用
+        int red =costs[0][0],bule=costs[0][1],green=costs[0][2];
+        for(int i=1;i<len ;i++){
+            int temp = red,temp2=green,temp3=bule;
+            red=Math.min(temp3,temp2)+costs[i][0];
+            bule=Math.min(temp,temp2)+costs[i][1];
+            green=Math.min(temp,temp3)+costs[i][2];
+        }
+        return Math.min(Math.min(red,bule),green);
+    }
     public static void main(String[] args) {
-        /*DayFive five=new DayFive();
-        System.out.println(five.defangIPaddr("1.1.1.1"));*/
-        RangeModule rangeModule = new RangeModule();
-        /*rangeModule.addRange(10,20);
-        rangeModule.removeRange(14,16);
-        System.out.println(rangeModule.queryRange(10,14));
-        System.out.println(rangeModule.queryRange(13,15));
-        System.out.println(rangeModule.queryRange(16,17));*/
-        rangeModule.addRange(10,180);//
-        rangeModule.addRange(150,200);//191
-        rangeModule.addRange(250,500);//251
-        System.out.println(rangeModule.queryRange(50,100));
-        System.out.println(rangeModule.queryRange(180,300));
-        System.out.println(rangeModule.queryRange(600,1000));
-        rangeModule.removeRange(50,150);
-        System.out.println(rangeModule.queryRange(50,100));
+        DayFive five=new DayFive();
+        System.out.println( five.minCost(new int[][]{{17,2,17},{16,16,5},{14,3,19}}));
+        //System.out.println(five.findSubstring( "wordgoodgoodgoodbestword",new String[]{"word","good","best","good"}) );
     }
 }
 class Node {

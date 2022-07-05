@@ -426,7 +426,7 @@ public class DayFour {
  *
  * 请注意 ，整数点是具有整数坐标的点。
  */
-class Solution {
+class Solution2 {
     /**
      * 不可以直接随机选择一个矩形然后再选择里面的点
      * 因为每个矩形里面的点数都不一样如果直接等概率直接选择矩形的话
@@ -436,7 +436,7 @@ class Solution {
     //面积前缀和
     int[] sum ;
     Random random;
-    public Solution(int[][] rects) {
+    public Solution2(int[][] rects) {
         random= new Random();
         sum =new int[rects.length];
         point=rects;
