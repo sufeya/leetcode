@@ -467,13 +467,55 @@ public class DaySix {
         list.set(index1,list.get(index2));
         list.set(index2,temp);
     }
+//堆排序算法，大根堆
+    public void heapSort(int[] nums){
+       int end = nums.length-1;
+        heapBuild(nums,end);
+       while(end>=0){
+           //交换第一个跟最后一个数
+           swap(nums,0,end);
+           end--;
+           heapify(nums,0,end);
+       }
+        System.out.println(nums);
+    }
+    public void heapBuild(int[] nums,int end){
+        //堆排序,构建大根堆,end为最后一个需要建堆的节点，则其父节点就是(end-1)/2
+        for(int i =(end-1)/2;i>=0;i--){
+            heapify(nums,i,end);
+        }
+    }
 
+    //建立大根堆进行排序
+    public void heapify(int[] nums ,int root,int end){
+        if(root>end){
+            return;
+        }
+        //找到root对应的子节点
+        int max= root,rightNode = root*2+1,leftNode = root*2+2;
+        //找到最大的子节点
+        if(rightNode <end+1 && nums[rightNode]>nums[max]){
+            max = rightNode;
+        }
+        if(leftNode<end+1 && nums[leftNode]>nums[max]){
+            max=leftNode;
+        }
+        //递归子节点进行建堆
+        if(max != root ){
+            swap(nums,max,root);
+            heapify(nums,max,end);
+        }
+    }
+    public void swap(int[] nums ,int index1,int index2){
+        int temp = nums[index1];
+        nums[index1]= nums[index2];
+        nums[index2] =temp;
+    }
     public static void main(String[] args) {
         DaySix six=new DaySix();
         int[] nums =   new int[]{1,4,3,4,1,2,1,3,1,3,2,3,3};
-        Arrays.sort(nums);
-        //six.wiggleSort(nums);
-        System.out.println( six.nextGreaterElement2( 2147483486));
+        six.heapSort(nums);
+        System.out.println( );
     }
 }
 /**
