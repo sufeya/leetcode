@@ -174,14 +174,14 @@ public class DayFive {
      *
      * 如果列表为空（给定的节点是 null），需要创建一个循环有序列表并返回这个节点。否则。请返回原先给定的节点。
      */
-    public Node insert(Node head, int insertVal) {
+    public Node2 insert(Node2 head, int insertVal) {
         if( head == null){
-            head = new Node(insertVal);
+            head = new Node2(insertVal);
             head.next=head;
             return head;
         }
-        Node pre =head,next = head.next;
-        Node inserNode = new Node(insertVal);
+        Node2 pre =head,next = head.next;
+        Node2 inserNode = new Node2(insertVal);
         pre=head;
         next=pre.next;
         do{
@@ -363,17 +363,17 @@ public class DayFive {
         //System.out.println(five.findSubstring( "wordgoodgoodgoodbestword",new String[]{"word","good","best","good"}) );
     }
 }
-class Node {
+class Node2 {
     public int val;
-    public Node next;
+    public Node2 next;
 
-    public Node() {}
+    public Node2() {}
 
-    public Node(int _val) {
+    public Node2(int _val) {
         val = _val;
     }
 
-    public Node(int _val, Node _next) {
+    public Node2(int _val, Node2 _next) {
         val = _val;
         next = _next;
     }
