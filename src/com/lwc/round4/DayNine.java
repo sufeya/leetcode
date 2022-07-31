@@ -148,6 +148,165 @@ public class DayNine {
       }
         return Math.min(sLen,nLen);
     }
+    /**
+     * 题号：1331
+     * 难度：简单
+     * 时间：20220728
+     * 给你一个整数数组 arr ，请你将数组中的每个元素替换为它们排序后的序号。
+     *
+     * 序号代表了一个元素有多大。序号编号的规则如下：
+     *
+     * 序号从 1 开始编号。
+     * 一个元素越大，那么序号越大。如果两个元素相等，那么它们的序号相同。
+     * 每个数字的序号都应该尽可能地小。
+     */
+    public int[] arrayRankTransform(int[] arr) {
+        int[]  ans = arr.clone();
+        int len = arr.length;
+        Arrays.sort(ans);
+        Map<Integer,Integer> map = new HashMap<>();
+       for(int i = 0 ;i<len;i++){
+            if(!map.containsKey(ans[i])){
+                map.put(ans[i],map.size());
+            }
+       }
+       for(int i =0;i<len ;i++){
+            ans[i]=map.get(arr[i]);
+       }
+        return arr;
+    }
+    /**
+     * 题号：593
+     * 难度：中等
+     * 时间：20220730
+     * 给定2D空间中四个点的坐标 p1, p2, p3 和 p4，如果这四个点构成一个正方形，则返回 true 。
+     *
+     * 点的坐标 pi 表示为 [xi, yi] 。输入 不是 按任何顺序给出的。
+     *
+     * 一个 有效的正方形 有四条等边和四个等角(90度角)。
+     */
+    public boolean validSquare(int[] p1, int[] p2, int[] p3, int[] p4) {
+
+        return isArr(p1,p2,p3)&&isArr(p2,p3,p4)&&isArr(p1,p3,p4)&&isArr(p1,p2,p4);
+    }
+    //判断是否是能构成直角
+    public boolean isArr(int[] p1,int[] p2,int[] p3){
+        long len1 =(p1[0]-p2[0])*(p1[0]-p2[0])+(p1[1]-p2[1])*(p1[1]-p2[1]);
+        long len3 =(p3[0]-p1[0])*(p3[0]-p1[0])+(p3[1]-p1[1])*(p3[1]-p1[1]);
+        long len2 =(p2[0]-p3[0])*(p2[0]-p3[0])+(p2[1]-p3[1])*(p2[1]-p3[1]);
+        //以p1为根节点判断是否垂直
+        boolean flag1 =false;
+        int[] arrP1= new int[]{p2[0]-p1[0],p2[1]-p1[1]};
+        int[] arrP12= new int[]{p3[0]-p1[0],p3[1]-p1[1]};
+        if(arrP1[0]*arrP12[0]+arrP1[1]*arrP12[1] == 0){
+
+           if(len1!=0 && len1 == len3){
+               flag1 =  true;
+           }
+
+        }
+        boolean flag2=false;
+        int[] arrP2 = new int[]{p1[0]-p2[0],p1[1]-p2[1]};
+        int[] arrP21= new int[]{p3[0]-p2[0],p3[1]-p2[1]};
+        if(arrP2[0]*arrP21[0]+arrP2[1]*arrP21[1] == 0){
+         if(len1 != 0 && len1 == len2){
+             flag2=  true;
+         }
+        }
+        boolean flag3=false;
+        int[] arrP3 = new int[]{p1[0]-p3[0],p1[1]-p3[1]};
+        int[] arrP31= new int[]{p2[0]-p3[0],p2[1]-p3[1]};
+        if(arrP3[0]*arrP31[0]+arrP3[1]*arrP31[1] == 0){
+            if(len2 !=0 && len3 == len2){
+                flag3 =  true;
+            }
+
+        }
+        return flag1||flag2||flag3;
+    }
+    /**
+     * 题号：952
+     * 难度：困难
+     * 时间：20220730
+     * 给定一个由不同正整数的组成的非空数组 nums ，考虑下面的图：
+     *
+     * 有 nums.length 个节点，按从 nums[0] 到 nums[nums.length - 1] 标记；
+     * 只有当 nums[i] 和 nums[j] 共用一个大于 1 的公因数时，nums[i] 和 nums[j]之间才有一条边。
+     * 返回 图中最大连通组件的大小 。
+     */
+    public int largestComponentSize(int[] nums) {
+        int len = nums.length,ans = 0;
+        //构建一个图，用于存放有大于一的因数的路径
+        List<Integer>[] graph = new List[len];
+        for(int i =0 ;i<len;i++){
+            graph[i] = new ArrayList<>();
+        }
+        for(int i = 0 ;i<len;i++ ){
+            for(int j = i+1;j<len;j++){
+                if(gcd(nums[i],nums[j])>1){
+                    graph[j].add(i);
+                    graph[i].add(j);
+                }
+            }
+        }
+
+        //使用广度优先遍历进行遍历图
+        Queue<Integer> queue = new ArrayDeque<>();
+        for(int i =0 ;i<len;i++){
+            int counts = 0;
+            //防止重复遍历
+            int[] visted = new int[len];
+            queue.offer(i);
+            counts++;
+            visted[i]=1;
+            while(!queue.isEmpty()){
+                int temp = queue.poll();
+                List<Integer> tempList =graph[temp];
+                for(Integer tempNode : tempList){
+                    if(visted[tempNode] != 1){
+                        counts++;
+                        visted[tempNode] = 1;
+                        queue.offer(tempNode);
+                    }
+                }
+            }
+            ans = Math.max(ans,counts);
+        }
+        return ans;
+    }
+    //辗转相除求最大公因数
+    public int largestComponentSize2(int[] nums) {
+        int max =-1,ans = 0;
+        for(int i =0;i<nums.length;i++){
+            max = Math.max(nums[i],max);
+        }
+        UnionFind unionFind = new UnionFind(max+1);
+        for(int i : nums){
+            for(int j = 2 ; j*j<=i;j++){
+                if(i%j == 0){
+                    unionFind.union(i,j);
+                    unionFind.union(i,i%j);
+                }
+            }
+        }
+        int[] counts = new int[max+1];
+        for(int i = 0;i< nums.length ;i++){
+            int root = unionFind.findParent(nums[i]);
+            counts[root]++;
+            ans = Math.max(ans,counts[root]);
+        }
+        return ans;
+    }
+    public long gcd(long a ,long b){
+        long remainder = a%b;
+        while(remainder != 0){
+            a = b;
+            b =remainder;
+            remainder = a%b;
+        }
+        return b;
+    }
+    //上述解法超时，现在采用并查集
 
     /**
      * 题号：592
@@ -190,9 +349,7 @@ public class DayNine {
     }
     public static void main(String[] args) {
         DayNine nine = new DayNine();
-        Skiplist skiplist = new Skiplist();
-        skiplist.add(9628);
-       Map map = nine.findOutPrime(6);
+        nine.largestComponentSize2(new int[]{4,6,15,35});
     }
 }
 /**
@@ -510,5 +667,41 @@ class CBTInserter {
 
     public TreeNode get_root() {
         return root;
+    }
+}
+class UnionFind{
+    //其中parent[i]表示的是i的父节点，rank[i]表示的是i为父节点其中子节点的数量或则深度
+    int[] parent,rank;
+    public UnionFind(int len){
+        parent = new int[len];
+        rank = new int[len];
+        //初始化时所有的父节点都指向自己，rank为1
+        for(int i = 0;i<len;i++){
+            parent[i] = i;
+            rank[i] = 1;
+        }
+    }
+    //找到parent 最原始的夫父节点，同时为了简化下一次查找的方便性
+    //直接再递归时将所有的子节点的父节点都指向最原始的节点
+    public int findParent(int x){
+        if(parent[x] != x){
+            parent[x] = findParent(parent[x]);
+        }
+        return parent[x];
+    }
+    //将两个集合进行合并
+    public void union(int x ,int y){
+        int f_x = findParent(x);
+        int f_y = findParent(y);
+        if(f_x != f_y){
+            //将秩少的合并到大的上面
+            if(rank[f_x] > rank[f_y]){
+                parent[f_y] = f_x;
+                rank[f_x] += rank[f_y];
+            }else{
+                parent[f_x] = f_y;
+                rank[f_y] += rank[f_x];
+            }
+        }
     }
 }
