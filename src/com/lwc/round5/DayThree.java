@@ -189,25 +189,7 @@ public class DayThree {
         }
         return step;
     }
-    public int lengthOfLongestSubstring(String s) {
-        int ans = 0;
-        Set<Character> set = new HashSet<>();
-        for(int i =0,j=0;i<s.length();i++){
-            char c = s.charAt(i);
-            if(set.contains(c)){
-                while(s.charAt(j) != c){
-                    set.remove(s.charAt(j));
-                    j++;
-                }
-                set.remove(s.charAt(j));
-                j++;
-            }
-            set.add(c);
-            ans = Math.max(set.size(),ans);
 
-        }
-        return ans;
-    }
     /**
      * 题号：1640
      * 难度：简单
@@ -369,10 +351,60 @@ public class DayThree {
         }
         return ans;
     }
+
+    /**
+     * 题号：17.09
+     * 难度：中等
+     * 时间：20220928
+     * 有些数的素因子只有 3，5，7，请设计一个算法找出第 k 个数。注意，不是必须有这些素因子，而是必须不包含其他的素因子。例如，前几个数按顺序应该是 1，3，5，7，9，15，21。
+     */
+    public int getKthMagicNumber(int k) {
+        int[] dp = new int[k+1];
+        dp[1] = 1;
+        int three = 1,five = 1,seven = 1;
+        for(int i = 2;i<k+1;i++){
+            int nThree = 3*dp[three],nFive = 5*dp[five],nSeven = dp[seven]*7;
+            dp[i] = Math.min(nThree,Math.min(nFive,nSeven));
+            if(dp[i] == nThree){
+                three++;
+            }
+            if(dp[i] == nFive){
+                five++;
+            }
+            if(dp[i] == nSeven){
+                seven++;
+            }
+        }
+        return dp[k];
+    }
+
+    /**
+     *字符串轮转。给定两个字符串s1和s2，请编写代码检查s2是否为s1旋转而成（比如，waterbottle是erbottlewat旋转后的字符串）。
+     */
+    public boolean isFlipedString(String s1, String s2) {
+        if(s1.equals("") && s2.equals("")){
+            return true;
+        }
+
+        String str = s1+s1;
+        int len = s1.length(),len2 = s2.length();
+        if((len == 0 && len2!=0) || (len!=0&&len2==0)){
+            return false;
+        }
+        for(int i =0;i<2*len-len2;i++){
+            String st = str.substring(i,i+len2);
+            if(st.equals(s2)) return true;
+        }
+        return false;
+    }
+
+    public int lengthOfLongestSubstring(String s) {
+        return 0;
+    }
     public static void main(String[] args) {
         DayThree three = new DayThree();
-        three.minimumRefill(new int[]{274,179,789,417,293,336,133,334,569,355,813,217,80,933,961,271,294,933,49,980,685,470,186,11,157,889,299,493,215,807,588,464,218,248,391,817,32,606,740,941,505,533,289,306,490
-        },996,1172);
+        three.isFlipedString("rxOpSEXvfIuoRJfjwgwuomevMMBOfeSMvYSPBaovrZBSgmCrSLDirNnILhARNShOYIFBHIRiFKHtfxWHjawaLRAEYPIZokUKgiqyZpvcOHdfPpRqHADKAXzEfzhxdXXb"
+                ,"");
 
 
     }
