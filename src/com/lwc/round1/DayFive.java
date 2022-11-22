@@ -1,5 +1,7 @@
 package com.lwc.round1;
 
+import com.lwc.common.ListNode;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -252,22 +254,5 @@ public class DayFive {
             }
         }
 
-    }
-}
-
-class ListNode {
-    int val;
-    ListNode next;
-
-    ListNode() {
-    }
-
-    ListNode(int val) {
-        this.val = val;
-    }
-
-    ListNode(int val, ListNode next) {
-        this.val = val;
-        this.next = next;
     }
 }
