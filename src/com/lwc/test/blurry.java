@@ -135,6 +135,8 @@ public class blurry{
         }
         return n - size;
     }
+
+
 }
 
 class Elem {
